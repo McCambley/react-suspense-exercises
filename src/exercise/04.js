@@ -29,24 +29,7 @@ const SUSPENSE_CONFIG = {
   busyMinDurationMs: 700,
 }
 
-// 🐨 create a pokemonResourceCache object
-const pokemonResourceCache = {}
-const PokemonContext = React.createContext(getPokemonResource)
-
-// 🐨 create a getPokemonResource function which accepts a name checks the cache
-// for an existing resource. If there is none, then it creates a resource
-// and inserts it into the cache. Finally the function should return the
-// resource.
-function getPokemonResource(pokemonName) {
-  // Make case agnostic just in case lol
-  const lowerName = pokemonName.toLowerCase()
-  let resource = pokemonResourceCache[lowerName]
-  if (!resource) {
-    resource = createPokemonResource(lowerName)
-    pokemonResourceCache[lowerName] = resource
-  }
-  return resource
-}
+const PokemonContext = React.createContext()
 
 function createPokemonResource(pokemonName) {
   return createResource(fetchPokemon(pokemonName))
@@ -54,6 +37,37 @@ function createPokemonResource(pokemonName) {
 
 function usePokemonResourceCache() {
   return React.useContext(PokemonContext)
+}
+
+function PokemonCacheProvider({children, cacheTime = 10000}) {
+  // 🐨 create a pokemonResourceCache object
+  const cache = React.useRef({})
+
+  // 🐨 create a getPokemonResource function which accepts a name checks the cache
+  // for an existing resource. If there is none, then it creates a resource
+  // and inserts it into the cache. Finally the function should return the
+  // resource.
+  const getPokemonResource = React.useCallback(
+    pokemonName => {
+      // Make case agnostic just in case lol
+      const lowerName = pokemonName.toLowerCase()
+      let cacheHit = cache.current[lowerName]
+      if (!cacheHit || cacheHit.time < new Date().getTime() - cacheTime) {
+        cacheHit = {
+          resource: createPokemonResource(lowerName),
+          time: new Date().getTime(),
+        }
+        cache.current[lowerName] = cacheHit
+      }
+      return cacheHit.resource
+    },
+    [cacheTime],
+  )
+  return (
+    <PokemonContext.Provider value={getPokemonResource}>
+      {children}
+    </PokemonContext.Provider>
+  )
 }
 
 function App() {
@@ -105,4 +119,12 @@ function App() {
   )
 }
 
-export default App
+function AppWithProvider() {
+  return (
+    <PokemonCacheProvider>
+      <App />
+    </PokemonCacheProvider>
+  )
+}
+
+export default AppWithProvider

@@ -23,6 +23,10 @@ function PokemonInfo({pokemonResource}) {
   )
 }
 
+function createPokemonResource(pokemonName) {
+  return createResource(fetchPokemon(pokemonName))
+}
+
 function App() {
   const [pokemonName, setPokemonName] = React.useState('')
   const [pokemonResource, setPokemonResource] = React.useState(null)
@@ -30,9 +34,9 @@ function App() {
   React.useEffect(() => {
     if (!pokemonName) {
       setPokemonResource(null)
-      return
+      return null
     }
-    const resource = createResource(fetchPokemon(pokemonName))
+    const resource = createPokemonResource(pokemonName)
     setPokemonResource(resource)
   }, [pokemonName])
 

@@ -1,3 +1,9 @@
+### Notice
+
+This repository is based on the original work from [Kent C. Dodds'](https://github.com/kentcdodds) Epic React course. All exercises, examples, and materials have been adapted from the original repository for personal learning purposes. Credit for the original content goes to Kent C. Dodds. This version is a personal adaptation to track progress and share learning outcomes.
+
+--- 
+
 <div>
   <h1 align="center"><a href="https://www.epicreact.dev/modules/react-suspense-v1/react-suspense-welcome">🔀 React Suspense 🚀 EpicReact.Dev</a></h1>
   <strong>
